@@ -41,6 +41,14 @@ require_once($CFG->dirroot . '/question/type/formulas/variables.php');
  */
 
 class functions_test extends \advanced_testcase {
+    private function assertEqualsCompat($expected, $actual, $delta, $message = '') {
+        if (version_compare(\PHPUnit\Runner\Version::id(), '9.0.0', '>=')) {
+            $this->assertEqualsWithDelta($expected, $actual, $delta, $message);
+        } else {
+            $this->assertEquals($expected, $actual, $message, $delta);
+        }
+    }
+
     /**
      * Test 1: ncr() test.
      */
@@ -468,7 +476,7 @@ class functions_test extends \advanced_testcase {
             array(stdnormpdf(-0.5), 0.35206533)
         );
         foreach ($testcases as $case) {
-            $this->assertEqualsWithDelta($case[1], $case[0], 1e-7);
+            $this->assertEqualsCompat($case[1], $case[0], 1e-7);
         }
     }
 
@@ -498,7 +506,7 @@ class functions_test extends \advanced_testcase {
             array(stdnormcdf(-0.5), 0.30854)
         );
         foreach ($testcases as $case) {
-            $this->assertEqualsWithDelta($case[1], $case[0], .00001);
+            $this->assertEqualsCompat($case[1], $case[0], .00001);
         }
     }
 
@@ -527,7 +535,7 @@ class functions_test extends \advanced_testcase {
             array(normcdf(-5, 5, 10), 0.15866)
         );
         foreach ($testcases as $case) {
-            $this->assertEqualsWithDelta($case[1], $case[0], .00001);
+            $this->assertEqualsCompat($case[1], $case[0], .00001);
         }
     }
 
