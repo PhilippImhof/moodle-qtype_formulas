@@ -33,7 +33,7 @@ jobs:
       matrix:
         php: ['7.2', '7.3', '7.4']
         moodle-branch: ['MOODLE_34_STABLE', 'MOODLE_35_STABLE', 'MOODLE_36_STABLE', 'MOODLE_37_STABLE', 'MOODLE_38_STABLE', 'MOODLE_310_STABLE']
-        database: [pgsql]
+        database: [mariadb]
         exclude:
           - moodle-branch: 'MOODLE_34_STABLE'
             php: '7.3'
@@ -80,7 +80,7 @@ jobs:
 
       - name: PHPUnit tests
         if: ${{ always() }}
-        run: moodle-plugin-ci phpunit --fail-on-warning
+        run: moodle-plugin-ci phpunit
 
       - name: Behat features
         if: ${{ always() }}
