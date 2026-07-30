@@ -1035,12 +1035,25 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
         // If we use the adaptive multipart behaviour, there will be some feedback about the grading,
         // e. g. the obtained marks for this submission and the attracted penalty.
         $gradingdetailsdiv = '';
+        $withholdfeedback = false;
         if ($qa->get_behaviour_name() == 'adaptivemultipart') {
             // This is rather a hack, but it will probably work.
             $renderer = $this->page->get_renderer('qbehaviour_adaptivemultipart');
             $details = $qa->get_behaviour()->get_part_mark_details($part->partindex);
+            // The general feedback should not be shown if the answer can still be improved, unless
+            // the part is finished. Note that a question can also be finished, because the student
+            // has attracted too many penalties and cannot get a grade > 0 anymore.
+            $isfinished = $qa->get_last_step()->has_behaviour_var('finish');
+            $canstillscore = !$state->is_gave_up() && (round($details->totalpenalty, $options->markdp) < $details->maxmark);
+            if ($details->improvable && $canstillscore && !$isfinished) {
+                $withholdfeedback = true;
+            }
             $gradingdetailsdiv = $renderer->render_adaptive_marks($details, $options);
-            $state = $details->state;
+            // We do not overwrite the state if the student "gave up", e. g. by finishing and submitting
+            // an unattempted question.
+            if (!$state->is_gave_up()) {
+                $state = $details->state;
+            }
         }
         // If the question is in a state that does not yet allow to give a feedback
         // or if the response is not the last one to be checked, we return an empty string.
@@ -1051,7 +1064,7 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
         // If we have a general feedback, we substitute local / grading variables and
         // wrap it in a <div>.
         $feedbackdiv = '';
-        if (strlen(trim($part->feedback)) !== 0) {
+        if (strlen(trim($part->feedback)) !== 0 && !$withholdfeedback) {
             $feedbacktext = $part->evaluator->substitute_variables_in_text($part->feedback);
             $feedbacktext = $question->format_text(
                 $feedbacktext,
@@ -1104,7 +1117,11 @@ class qtype_formulas_renderer extends qtype_with_combined_feedback_renderer {
 
         if ($qa->get_behaviour_name() == 'adaptivemultipart') {
             $details = $qa->get_behaviour()->get_part_mark_details($part->partindex);
-            $feedbackclass = $details->state->get_feedback_class();
+            // If the student "gave up", we must not take the feedback from the multipart behaviour.
+            $feedbackclass = $state->get_feedback_class();
+            if (!$state->is_gave_up()) {
+                $feedbackclass = $details->state->get_feedback_class();
+            }
         } else {
             $state = question_state::graded_state_for_fraction($fraction);
             $feedbackclass = $state->get_feedback_class();
