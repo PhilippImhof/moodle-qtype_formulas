@@ -355,10 +355,9 @@ final class renderer_test extends walkthrough_test_base {
         $this->check_output_contains_lang_string('correctansweris', 'qtype_formulas', '3,5');
 
         // Make sure the decimal comma is also applied for numbers that are string tokens.
-        // Note that we *should* have 3,50 as the model answer, but as we are converting
-        // the string output from sigfig() back to a number, trailing zeroes will be lost.
         $q = $this->get_test_formulas_question('testsinglenum');
         $q->parts[0]->answer = 'sigfig(3.5, 3)';
+        $this->start_attempt_at_question($q, 'immediatefeedback', 1);
         $this->process_submission(['0_0' => '42', '-submit' => 1]);
         $this->check_output_contains_lang_string('correctansweris', 'qtype_formulas', '3,50');
     }
