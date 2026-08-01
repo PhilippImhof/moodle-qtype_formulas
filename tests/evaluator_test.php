@@ -1363,7 +1363,7 @@ final class evaluator_test extends \advanced_testcase {
         // placeholders is covered in another test.
         $text = '{a} -- {b} -- {c} -- {d} -- {e} -- {f}';
         $output = $evaluator->substitute_variables_in_text($text);
-        $expected = '0.3 -- 0.3 -- 5.0E-6 -- 5.0E-6 -- 1.2164510040883E+17 -- 1.22E+17';
+        $expected = '0.3 -- 0.30 -- 5.0E-6 -- 5.0000000E-6 -- 1.2164510040883E+17 -- 1.22E+17';
         self::assertEquals($expected, $output);
 
         // Setting the localised decimal separator, but disallow the decimal comma in the admin settings.
@@ -1371,7 +1371,7 @@ final class evaluator_test extends \advanced_testcase {
         set_config('allowdecimalcomma', 1, 'qtype_formulas');
         self::assertEquals('1', get_config('qtype_formulas', 'allowdecimalcomma'));
         $output = $evaluator->substitute_variables_in_text($text);
-        $expected = '0,3 -- 0,3 -- 5,0E-6 -- 5,0E-6 -- 1,2164510040883E+17 -- 1,22E+17';
+        $expected = '0,3 -- 0,30 -- 5,0E-6 -- 5,0000000E-6 -- 1,2164510040883E+17 -- 1,22E+17';
         self::assertEquals($expected, $output);
     }
 
