@@ -669,6 +669,7 @@ final class functions_test extends \advanced_testcase {
             ['123.00', 'sigfig(123, 5)'],
             ['99999.0', 'sigfig(99999, 6)'],
             ['-0.00123', 'sigfig(-0.00123, 3)'],
+            ['0.00', 'sigfig(0, 3)'],
         ];
     }
 

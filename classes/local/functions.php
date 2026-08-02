@@ -659,8 +659,8 @@ class functions {
         $digitsafter = max(0, $digitsafter);
 
         // If the absolute value of the *original* number is >= 1e-4 and < 1e14, we can format
-        // it and return a string.
-        if (abs($originalnumber) >= 1e-4 && abs($originalnumber) < 1e14) {
+        // it and return a string. The same is true if the rounded number is zero.
+        if ($number == 0 || (abs($originalnumber) >= 1e-4 && abs($originalnumber) < 1e14)) {
             return number_format($number, $digitsafter, '.', '');
         }
 
