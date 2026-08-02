@@ -1248,10 +1248,14 @@ final class renderer_test extends walkthrough_test_base {
                 $this->check_output_does_not_contain($feedback);
             }
         }
-        // In adaptive and interactive mode, the general feedback should not be shown if the student can still improve their grade,
-        // i. e. if their answer is not yet correct and there are tries left. (For adaptive mode, the number of tries is not limited,
-        // but after a certain number of wrong answers, the student will have too many penalties and cannot get a grade > 0 anymore.
-        if ($input['behaviour'] === 'immediatefeedback' || $expectedfeedback === qtype_formulas_test_helper::DEFAULT_CORRECT_FEEDBACK) {
+        // In adaptive and interactive mode, the general feedback should not be shown if the student can still improve their
+        // grade, i. e. if their answer is not yet correct and there are tries left. (For adaptive mode, the number of tries
+        // is not limited, but after a certain number of wrong answers, the student will have too many penalties and cannot get
+        // a grade > 0 anymore.
+        if (
+            $input['behaviour'] === 'immediatefeedback'
+            || $expectedfeedback === qtype_formulas_test_helper::DEFAULT_CORRECT_FEEDBACK
+        ) {
             $this->check_output_contains($generalfeedback);
         } else {
             $this->check_output_does_not_contain($generalfeedback);
@@ -1293,5 +1297,23 @@ final class renderer_test extends walkthrough_test_base {
         $this->start_attempt_at_question($q, 'adaptive', 1);
         $this->process_submission(['-finish' => 1]);
         $this->check_output_contains($generalfeedback);
+    }
+
+    public function test_hiding_correct_answer(): void {
+        // Create the requested question.
+        $q = $this->get_test_formulas_question('testsinglenum');
+
+        // Start question and submit wrong answer. The correct answer should be shown.
+        $this->start_attempt_at_question($q, 'immediatefeedback', 1);
+        $this->process_submission(['0_0' => '4', '-submit' => 1]);
+        $this->check_output_contains_lang_string('correctansweris', 'qtype_formulas', '5');
+
+        // Change setting.
+        $q->parts[0]->hidecorrectanswer = '1';
+
+        // Submit a wrong answer again. Now the correct answer should not be shown.
+        $this->start_attempt_at_question($q, 'immediatefeedback', 1);
+        $this->process_submission(['0_0' => '4', '-submit' => 1]);
+        $this->check_output_does_not_contain(get_string('correctansweris', 'qtype_formulas', '5'));
     }
 }
